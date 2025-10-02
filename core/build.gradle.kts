@@ -11,4 +11,7 @@ dependencies {
 
     // Script engine for CalcTool
     implementation("org.openjdk.nashorn:nashorn-core:15.4")
+
+    // Testing
+    testImplementation(kotlin("test"))
 }

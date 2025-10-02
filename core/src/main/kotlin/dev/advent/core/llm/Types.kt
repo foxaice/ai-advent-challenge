@@ -35,10 +35,19 @@ data class ToolJsonSchema(
 )
 
 @Serializable
+enum class ResponseFormat {
+    JSON,      // Structured JSON response
+    MARKDOWN,  // Markdown formatted response
+    PLAIN      // Plain text response
+}
+
+@Serializable
 data class GenerationConfig(
     val temperature: Double? = null,
     val topK: Int? = null,
     val topP: Double? = null,
+    val responseFormat: ResponseFormat? = null,
+    val responseSchema: String? = null  // JSON schema example for the response
 )
 
 // Response wrapper unified for providers

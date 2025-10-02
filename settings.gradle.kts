@@ -4,5 +4,6 @@ include(
     "provider-gemini",
     "provider-deepseek",
     "day01-agent-cli",
-    "day01-agent-web"
+    "day01-agent-web",
+    "day02-agent-web"
 )

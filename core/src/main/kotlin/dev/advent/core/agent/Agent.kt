@@ -18,11 +18,38 @@ class Agent(
     suspend fun chatOnce(userText: String): String {
         logger.debug("User input: {}", userText)
 
+        // Build enhanced system instruction with format requirements
+        val enhancedSystemInstruction = buildString {
+            if (systemInstruction != null) {
+                append(systemInstruction)
+                append("\n\n")
+            }
+
+            // Add format instructions based on config
+            config.responseFormat?.let { format ->
+                append("ВАЖНО: Формат ответа должен быть ${format.name}.\n")
+                when (format) {
+                    ResponseFormat.JSON -> {
+                        append("Возвращай ответ ТОЛЬКО в формате JSON без дополнительного текста.\n")
+                        config.responseSchema?.let { schema ->
+                            append("Используй следующую структуру:\n$schema\n")
+                        }
+                    }
+                    ResponseFormat.MARKDOWN -> {
+                        append("Используй Markdown для форматирования ответа (заголовки, списки, код).\n")
+                    }
+                    ResponseFormat.PLAIN -> {
+                        append("Возвращай только простой текст без форматирования.\n")
+                    }
+                }
+            }
+        }
+
         // 1) ask model with tool declarations
         logger.debug("Calling LLM provider: model={}, tools={}", model, tools.declarations().map { it.name })
         val initial = provider.generate(
             model = model,
-            systemInstruction = systemInstruction,
+            systemInstruction = enhancedSystemInstruction.ifEmpty { null },
             contents = listOf(
                 Content(Role.user, listOf(Part.Text(userText)))
             ),
@@ -50,7 +77,7 @@ class Agent(
                 logger.debug("Sending tool result back to LLM")
                 val final = provider.generate(
                     model = model,
-                    systemInstruction = systemInstruction,
+                    systemInstruction = enhancedSystemInstruction.ifEmpty { null },
                     contents = listOf(
                         Content(
                             role = Role.model,
