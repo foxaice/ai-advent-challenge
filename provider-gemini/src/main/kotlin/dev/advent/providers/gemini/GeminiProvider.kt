@@ -5,6 +5,7 @@ import dev.advent.core.util.Json
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -27,6 +28,18 @@ class GeminiProvider(
     private val client = HttpClient {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true; isLenient = true; encodeDefaults = true })
+        }
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.BODY
+            filter { request ->
+                // Log all requests
+                true
+            }
+            sanitizeHeader { header ->
+                // Sanitize API key from logs
+                (header == "Authorization" || header.contains("key", ignoreCase = true))
+            }
         }
     }
 
