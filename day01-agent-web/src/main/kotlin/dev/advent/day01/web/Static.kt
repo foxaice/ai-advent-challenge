@@ -18,6 +18,7 @@ private val indexHtml = """
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI Advent — День 1 веб-чат</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><defs><linearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23667eea'/><stop offset='100%25' style='stop-color:%23764ba2'/></linearGradient></defs><circle cx='32' cy='28' r='20' fill='url(%23grad)'/><path d='M20 40 L24 48 L28 40' fill='url(%23grad)'/><circle cx='26' cy='24' r='2' fill='white'/><circle cx='32' cy='24' r='2' fill='white'/><circle cx='38' cy='24' r='2' fill='white'/><path d='M44 12 L46 16 L50 18 L46 20 L44 24 L42 20 L38 18 L42 16 Z' fill='%2319c37d'/></svg>"/>
   <style>
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;margin:0;padding:0;height:100vh;display:flex;flex-direction:column;background:#343541}
