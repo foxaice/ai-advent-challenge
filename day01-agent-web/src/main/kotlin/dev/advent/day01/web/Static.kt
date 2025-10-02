@@ -47,12 +47,12 @@ private val indexHtml = """
     .message{max-width:800px;margin:0 auto;width:100%;display:flex;gap:12px;animation:messageSlideIn 0.5s cubic-bezier(0.34,1.56,0.64,1)}
     @keyframes messageSlideIn{from{opacity:0;transform:translateY(30px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
     .message.user{flex-direction:row-reverse}
-    .avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;animation:avatarBounce 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;animation:avatarBounce 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);box-shadow:0 4px 12px rgba(0,0,0,.2);user-select:none}
     @keyframes avatarBounce{0%{transform:scale(0) rotate(-180deg)}60%{transform:scale(1.2) rotate(20deg)}100%{transform:scale(1) rotate(0)}}
     .message.user .avatar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
     .message.bot .avatar{background:linear-gradient(135deg,#19c37d 0%,#0f9960 100%);color:#fff;animation:avatarPulse 2s ease-in-out infinite}
     @keyframes avatarPulse{0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.2)}50%{box-shadow:0 4px 20px rgba(25,195,125,.5)}}
-    .bubble{background:#444654;color:#ececf1;padding:12px 16px;border-radius:12px;max-width:70%;word-wrap:break-word;white-space:pre-wrap;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,.15);position:relative;animation:bubblePop 0.4s cubic-bezier(0.68,-0.55,0.265,1.55) 0.1s backwards}
+    .bubble{background:#444654;color:#ececf1;padding:12px 16px;border-radius:12px;max-width:70%;word-wrap:break-word;white-space:pre-wrap;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,.15);position:relative;animation:bubblePop 0.4s cubic-bezier(0.68,-0.55,0.265,1.55) 0.1s backwards;user-select:text;cursor:default}
     @keyframes bubblePop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
     .message.user .bubble{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;box-shadow:0 4px 16px rgba(102,126,234,.3)}
     .message.bot .bubble{background:linear-gradient(135deg,#444654 0%,#3a3b4a 100%)}
