@@ -44,6 +44,11 @@ private val indexHtml = """
     .message.bot .avatar{background:#19c37d;color:#fff}
     .bubble{background:#444654;color:#ececf1;padding:12px 16px;border-radius:12px;max-width:70%;word-wrap:break-word;white-space:pre-wrap;line-height:1.6;box-shadow:0 1px 2px rgba(0,0,0,.1)}
     .message.user .bubble{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
+    .loading{display:flex;gap:4px;padding:8px 0}
+    .loading-dot{width:8px;height:8px;border-radius:50%;background:#ececf1;animation:bounce 1.4s infinite ease-in-out}
+    .loading-dot:nth-child(1){animation-delay:-0.32s}
+    .loading-dot:nth-child(2){animation-delay:-0.16s}
+    @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
   </style>
 </head>
 <body>
@@ -84,12 +89,55 @@ private val indexHtml = """
       chat.scrollTop = chat.scrollHeight;
     }
 
+    function showLoading(){
+      const msg = document.createElement('div');
+      msg.className = 'message bot';
+      msg.id = 'loading-msg';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      const loading = document.createElement('div');
+      loading.className = 'loading';
+      loading.innerHTML = '<div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>';
+      bubble.appendChild(loading);
+
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function hideLoading(){
+      const loadingMsg = document.getElementById('loading-msg');
+      if(loadingMsg) loadingMsg.remove();
+    }
+
     async function send(){
-      const text = q.value.trim(); if(!text) return; q.value=''; add('me', text);
+      const text = q.value.trim(); if(!text) return;
+      q.value='';
+      q.disabled = true;
+      sendBtn.disabled = true;
+
+      add('me', text);
+      showLoading();
+
       try{
         const res = await fetch('/api/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message:text})});
-        const data = await res.json(); add('bot', data.reply);
-      }catch(e){ add('bot','Ошибка: '+e.message); }
+        const data = await res.json();
+        hideLoading();
+        add('bot', data.reply);
+      }catch(e){
+        hideLoading();
+        add('bot','Ошибка: '+e.message);
+      }
+
+      q.disabled = false;
+      sendBtn.disabled = false;
+      q.focus();
     }
 
     q.addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
