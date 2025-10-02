@@ -36,9 +36,13 @@ private val indexHtml = """
     .input-wrapper{background:#40414f;padding:16px 20px;border-top:1px solid #565869;flex-shrink:0;animation:slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1)}
     @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
     .input-container{max-width:800px;margin:0 auto;display:flex;gap:12px;align-items:center}
-    input{flex:1;background:#40414f;border:1px solid #565869;color:#ececf1;padding:14px 16px;border-radius:8px;font-size:15px;outline:none;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
-    input:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.15),0 0 20px rgba(102,126,234,.1);transform:translateY(-1px)}
-    input::placeholder{color:#8e8ea0}
+    textarea{flex:1;background:#40414f;border:1px solid #565869;color:#ececf1;padding:14px 16px 14px 12px;border-radius:8px;font-size:15px;outline:none;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);font-family:inherit;resize:none;min-height:50px;max-height:200px;overflow-y:auto}
+    textarea:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.15),0 0 20px rgba(102,126,234,.1);transform:translateY(-1px)}
+    textarea::placeholder{color:#8e8ea0}
+    textarea::-webkit-scrollbar{width:8px}
+    textarea::-webkit-scrollbar-track{background:transparent;margin:4px}
+    textarea::-webkit-scrollbar-thumb{background:#565869;border-radius:4px;transition:background 0.3s;border:2px solid transparent;background-clip:padding-box}
+    textarea::-webkit-scrollbar-thumb:hover{background:#6b6d7d;background-clip:padding-box}
     button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:14px 24px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
     button::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.3);transform:translate(-50%,-50%);transition:width 0.6s,height 0.6s}
     button:hover::before{width:300px;height:300px}
@@ -105,7 +109,7 @@ private val indexHtml = """
 
   <div class="input-wrapper">
     <div class="input-container">
-      <input id="q" placeholder="Напишите сообщение…" />
+      <textarea id="q" placeholder="Напишите сообщение…" rows="1"></textarea>
       <button id="send">Отправить</button>
     </div>
   </div>
@@ -199,6 +203,7 @@ private val indexHtml = """
     async function send(){
       const text = q.value.trim(); if(!text) return;
       q.value='';
+      q.style.height = 'auto';
       q.disabled = true;
       sendBtn.disabled = true;
 
@@ -219,7 +224,18 @@ private val indexHtml = """
       q.focus();
     }
 
-    q.addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
+    // Auto-resize textarea
+    q.addEventListener('input', function(){
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
+
+    q.addEventListener('keydown', e=>{
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        send();
+      }
+    });
     sendBtn.addEventListener('click', send);
 
     // Auto-focus input on page load
