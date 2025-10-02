@@ -19,35 +19,45 @@ private val indexHtml = """
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI Advent — День 1 веб-чат</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;margin:0;padding:0;height:100vh;display:flex;flex-direction:column}
-    .header{max-width:760px;width:100%;margin:0 auto;padding:40px 16px 0;flex-shrink:0}
-    .chat-container{flex:1;overflow-y:auto;max-width:760px;width:100%;margin:0 auto;padding:0 16px}
-    .input-wrapper{max-width:760px;width:100%;margin:0 auto;padding:0 16px 16px;flex-shrink:0}
-    .card{border:1px solid #ddd;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 4px 12px rgba(0,0,0,.04)}
-    .row{display:flex;gap:8px}
-    input,button{font-size:16px;padding:12px;border-radius:12px;border:1px solid #ccc}
-    input{flex:1}
-    button{cursor:pointer}
-    .msg{white-space:pre-wrap}
-    .me{color:#333}
-    .bot{color:#111}
-    .muted{color:#666;font-size:12px}
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;margin:0;padding:0;height:100vh;display:flex;flex-direction:column;background:#343541}
+    .header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.2);flex-shrink:0}
+    .header h1{margin:0;font-size:24px;font-weight:600}
+    .header p{margin:8px 0 0;font-size:14px;opacity:0.9}
+    .chat-container{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+    .chat-container::-webkit-scrollbar{width:8px}
+    .chat-container::-webkit-scrollbar-track{background:transparent}
+    .chat-container::-webkit-scrollbar-thumb{background:#565869;border-radius:4px}
+    .input-wrapper{background:#40414f;padding:16px 20px;border-top:1px solid #565869;flex-shrink:0}
+    .input-container{max-width:800px;margin:0 auto;display:flex;gap:12px;align-items:center}
+    input{flex:1;background:#40414f;border:1px solid #565869;color:#ececf1;padding:14px 16px;border-radius:8px;font-size:15px;outline:none;transition:border-color 0.2s}
+    input:focus{border-color:#667eea}
+    input::placeholder{color:#8e8ea0}
+    button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:14px 24px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;transition:transform 0.1s,box-shadow 0.2s}
+    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,126,234,.4)}
+    button:active{transform:translateY(0)}
+    .message{max-width:800px;margin:0 auto;width:100%;display:flex;gap:12px;animation:fadeIn 0.3s ease-in}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .message.user{flex-direction:row-reverse}
+    .avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600}
+    .message.user .avatar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
+    .message.bot .avatar{background:#19c37d;color:#fff}
+    .bubble{background:#444654;color:#ececf1;padding:12px 16px;border-radius:12px;max-width:70%;word-wrap:break-word;white-space:pre-wrap;line-height:1.6;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+    .message.user .bubble{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🔥 AI Advent — День 1: первый агент (веб)</h1>
-    <p class="muted">Модель: Gemini (через REST). Инструмент: <code>calc</code>.</p>
+    <h1>🔥 AI Advent — День 1</h1>
+    <p>Модель: Gemini • Инструмент: calc</p>
   </div>
 
   <div class="chat-container" id="chat"></div>
 
   <div class="input-wrapper">
-    <div class="card">
-      <div class="row">
-        <input id="q" placeholder="Напишите сообщение…" />
-        <button id="send">Отправить</button>
-      </div>
+    <div class="input-container">
+      <input id="q" placeholder="Напишите сообщение…" />
+      <button id="send">Отправить</button>
     </div>
   </div>
 
@@ -57,10 +67,20 @@ private val indexHtml = """
     const sendBtn = document.getElementById('send');
 
     function add(role, text){
-      const div = document.createElement('div');
-      div.className = 'card msg ' + (role==='me'?'me':'bot');
-      div.textContent = (role==='me'?'👤 ':'🤖 ') + text;
-      chat.appendChild(div);
+      const msg = document.createElement('div');
+      msg.className = 'message ' + (role==='me'?'user':'bot');
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = role==='me'?'👤':'🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
     }
 
