@@ -165,16 +165,26 @@ private val indexHtml = """
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      bubble.textContent = text;
+
+      // Цветное форматирование для ответов бота
+      if (role === 'bot') {
+        try {
+          // Пытаемся распарсить как JSON и применить подсветку
+          const highlighted = syntaxHighlight(text);
+          bubble.innerHTML = highlighted;
+        } catch (e) {
+          // Если не JSON, показываем как есть
+          bubble.textContent = text;
+        }
+        displayJson(text);
+      } else {
+        bubble.textContent = text;
+      }
 
       msg.appendChild(avatar);
       msg.appendChild(bubble);
       chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
-
-      if (role === 'bot') {
-        displayJson(text);
-      }
     }
 
     function showLoading() {
