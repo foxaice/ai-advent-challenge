@@ -124,7 +124,7 @@ private val indexHtml = """
         .join('<br>');
     }
 
-    function add(role, text, complete = false) {
+    async function add(role, text, complete = false) {
       const msg = document.createElement('div');
       msg.className = 'message ' + (role === 'me' ? 'user' : 'assistant');
 
@@ -135,6 +135,18 @@ private val indexHtml = """
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
 
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chat.appendChild(msg);
+
+      // Для сообщений пользователя показываем сразу
+      if (role === 'me') {
+        bubble.innerHTML = escapeHtml(text);
+        chat.scrollTop = chat.scrollHeight;
+        return;
+      }
+
+      // Для ответов бота - анимация печати
       let messageContent = text;
       let tzContent = '';
 
@@ -146,14 +158,89 @@ private val indexHtml = """
         messageContent = beforeDuck + '\n\n✨ Сказочная утка создана:';
       }
 
-      bubble.innerHTML = escapeHtml(messageContent) +
-        (tzContent ? `<div class="tz-content">${'$'}{formatTz(tzContent)}</div>` : '') +
-        (complete ? '<div class="complete-badge">✓ Готово</div>' : '');
+      // Печатаем основной текст
+      await typeText(bubble, messageContent);
 
-      msg.appendChild(avatar);
-      msg.appendChild(bubble);
-      chat.appendChild(msg);
+      // Если есть ТЗ утки, добавляем его с анимацией
+      if (tzContent) {
+        const tzDiv = document.createElement('div');
+        tzDiv.className = 'tz-content';
+        bubble.appendChild(tzDiv);
+
+        // Печатаем содержимое ТЗ с форматированием
+        await typeMarkdown(tzDiv, tzContent);
+      }
+
+      // Добавляем badge если завершено
+      if (complete) {
+        const badge = document.createElement('div');
+        badge.className = 'complete-badge';
+        badge.textContent = '✓ Готово';
+        bubble.appendChild(badge);
+      }
+
       chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function typeText(element, text) {
+      let currentText = '';
+
+      for (let i = 0; i < text.length; i++) {
+        currentText += text[i];
+        element.textContent = currentText;
+        chat.scrollTop = chat.scrollHeight;
+
+        // Задержка между символами (быстрая печать)
+        await new Promise(resolve => setTimeout(resolve, 15));
+      }
+    }
+
+    async function typeMarkdown(element, text) {
+      const lines = text.split('\n');
+      let html = '';
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const line = lines[lineIndex];
+
+        if (line.startsWith('## ')) {
+          // Заголовок - печатаем посимвольно
+          html += '<h2>';
+          element.innerHTML = html;
+
+          const headerText = line.substring(3);
+          let currentHeader = '';
+          for (let i = 0; i < headerText.length; i++) {
+            currentHeader += headerText[i];
+            element.innerHTML = html + escapeHtml(currentHeader);
+            chat.scrollTop = chat.scrollHeight;
+            await new Promise(resolve => setTimeout(resolve, 15));
+          }
+
+          html += escapeHtml(headerText) + '</h2>';
+          element.innerHTML = html;
+        } else if (line.trim() === '') {
+          // Пустая строка
+          html += '<br>';
+          element.innerHTML = html;
+        } else {
+          // Обычный текст - печатаем посимвольно
+          let currentLine = '';
+          for (let i = 0; i < line.length; i++) {
+            currentLine += line[i];
+            element.innerHTML = html + escapeHtml(currentLine);
+            chat.scrollTop = chat.scrollHeight;
+            await new Promise(resolve => setTimeout(resolve, 15));
+          }
+
+          html += escapeHtml(line) + '<br>';
+          element.innerHTML = html;
+        }
+
+        // Небольшая пауза между строками
+        if (lineIndex < lines.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }
     }
 
     function showLoading() {
