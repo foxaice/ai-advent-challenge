@@ -6,5 +6,6 @@ include(
     "day01-agent-cli",
     "day01-agent-web",
     "day02-agent-web",
-    "day03-agent-web"
+    "day03-agent-web",
+    "day04-agent-web"
 )
